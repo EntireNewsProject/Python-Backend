@@ -14,7 +14,10 @@ def parse(url):
 
     for article in dict['articles']:
         print(article['url'])
-
+#create function scrap then call inside of for
+#store everything in dict
+#after scracping convert to json
+## send to node.js using request
 
 parse('bbc-news')
 parse('cnbc')
