@@ -34,8 +34,6 @@ def fetch_content(url):
         dic.append(s)
         index += 1
 
-
-
     return dic  # return the list of articles text content
 print('-----------------------------------------------------------------------------------------------------------------------------------')
 data= fetch_content('cnn')
