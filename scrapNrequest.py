@@ -17,27 +17,29 @@ def fetch_content(url):
     req = requests.get(source + url + api)
     dict_source = loads(req.text)
     dict_result = []
-    for article in dict_source['articles']:
-        dict_result.append(article['url'])  # add all url links from the api source dictionary into dict_result as a list
     text = []
-    for text_source in dict_result:
-        text.append(scrap_content(text_source))  # put all article's text into a list call text
+    for article in dict_source['articles']:
+        #dict_result.append(article['url'])  # add all url links from the api source dictionary into dict_result as a list
+        text.append(scrap_content(article['url']))
+    #print(TEXT)
+    #for text_source in dict_result:  # put all article's text into a list call text
     s={}
     dic_text = {}
     index = 0
     dic = []
     for descrip in text:
         dic_text['text'] = descrip
-        s[str(index)] = dic_text
-        print(s)
-        dic.append(s)
+        #s[str(index)] = dic_text
+        dic.append(dic_text)
+        #print(dic)
         index += 1
 
+    print(dic)
     return dic  # return the list of articles text content
 print('-----------------------------------------------------------------------------------------------------------------------------------')
 data= fetch_content('cnn')
 print('--------------------------------------------------------------------')
-#print(data)
+
 def convert2json(dir, name, data):
     directory = './' + dir + '/' + name + '.json'
     with open(directory,'w') as filejson:
