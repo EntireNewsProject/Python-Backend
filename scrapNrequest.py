@@ -24,7 +24,14 @@ def fetch_source(url):
         text.append(scrap_content(text_source)) #put all article's text into a list call text
     return text # return the list of articles text content
 
+def function_testing(url):
+    x = fetch_source(url)
+    print(x[0])
 
+function_testing('cnn')
+print('---------------------------------------------------------')
+print('')
+function_testing('bbc-news')
 
 
 def send_req():
