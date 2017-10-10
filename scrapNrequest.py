@@ -1,54 +1,38 @@
 import requests
+from newspaper import Article
 from json import loads, dumps
 
 source = "https://newsapi.org/v1/articles?source="
 api = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
 
+
+def scrap_content(url):
+    article = Article(url)
+    article.download()
+    article.parse()
+    return article.text
+
+
 def fetch_source(url):
     req = requests.get(source + url + api)
-    dict = loads(req.text)
-    index=0
-    dic= {}
-    for article in dict['articles']:
-        dic[str(index)] = article['url'] #storing all url into dictionary
-        index = index + 1 # url location in dictionary
-    return dic #returning the url dictionary
+    dict_source = loads(req.text)
+    dict_result = []
+    for article in dict_source['articles']:
+        dict_result.append(article['url'])  # add all url links from the api source dictionary into dict_result as a list
+    text = []
+    for text_source in dict_result:
+        text.append(scrap_content(text_source)) #put all article's text into a list call text
+    return text # return the list of articles text content
 
-def fetch_titles(url):
-    req = requests.get(source + url + api)
-    dict = loads(req.text)
-    index=0
-    dic= {}
-    for article in dict['articles']:
-        dic[str(index)] = article['title']
-        index = index + 1
-    return dic
 
-def fetch_description(url):
-    req = requests.get(source + url + api)
-    dict = loads(req.text)
-    index=0
-    dic= {}
-    for article in dict['articles']:
-        dic[str(index)] = article['description']
-        index = index + 1
-    return dic
 
-def fetch_datetime(url):
-    req = requests.get(source + url + api)
-    dict = loads(req.text)
-    index=0
-    dic= {}
-    for article in dict['articles']:
-        if article['publishedAt']: #only add to dictionary if there is a published date/time
-            dic[str(index)] = article['publishedAt']
-            index = index + 1
-    return dic
 
-#create function scrap then call inside of for
-#store everything in dict
-#after scracping convert to json
+def send_req():
+    pass
+
+#        if article['publishedAt']:  # only add to dictionary if there is a published date/time
+
+# create function scrap then call inside of for
+# store everything in dict
+# after scracping convert to json
 ## send to node.js using request
-
-#cnn_paper = newspaper.build('http://cnn.com')
-#art= requests.get(cnn_paper.articles)
