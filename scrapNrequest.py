@@ -19,7 +19,6 @@ def fetch_content(url):
     dict_result = []
     for article in dict_source['articles']:
         dict_result.append(article['url'])  # add all url links from the api source dictionary into dict_result as a list
-
     text = []
     for text_source in dict_result:
         text.append(scrap_content(text_source))  # put all article's text into a list call text
