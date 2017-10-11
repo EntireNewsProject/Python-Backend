@@ -21,14 +21,13 @@ def fetch_content(url):
         dict_url = {}
         dict_url ['url'] = article['url']
         links.append(dict_url) # put all article's text into a list call text
-    text = []
+    jlink = []
     for descrip in links:
         dic_text = {}
         dic_text['text'] = scrap_content(descrip['url'])
-        text.append(dic_text)
-
-    links.append(text)
-    return links # return the list of articles text content
+        jlink.append(descrip)
+        jlink.append(dic_text)
+    return jlink # return the list of articles text content
 print('-----------------------------------------------------------------------------------------------------------------------------------')
 print(fetch_content('cnn'))
 print('--------------------------------------------------------------------')
