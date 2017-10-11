@@ -29,15 +29,15 @@ def fetch_content(url):
         jlink.append(dic_text)
     return jlink # return the list of articles text content
 print('-----------------------------------------------------------------------------------------------------------------------------------')
-print(fetch_content('cnn'))
+live_data = fetch_content('cnn')
 print('--------------------------------------------------------------------')
 
 def convert2json(dir, name, data):
     directory = './' + dir + '/' + name + '.json'
     with open(directory,'w') as filejson:
         json.dump(data, filejson)
+#convert2json('./','example2',live_data)
 
-    #convert2json('./','example', )
 
 
 #        if article['publishedAt']:  # only add to dictionary if there is a published date/time
