@@ -6,6 +6,7 @@ from time import sleep
 
 source = "https://newsapi.org/v1/articles?source="
 api = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
+server = "http://entirenews.tk:3000/api/news?source=bbc"
 SLEEP_TIME_IN_SEC = 1
 SLEEP_TIME_IN_MILI_SEC = 0.3
 
@@ -13,10 +14,10 @@ SLEEP_TIME_IN_MILI_SEC = 0.3
 def send_post_req(url, data, params=None):
     print('send post req')
     if params is None:
-        params = {'token': TOKEN}  # params = { 'token': XXX }
+        params = {'token': 'TOKEN'}  # params = { 'token': XXX }
     else:
-        params['token'] = TOKEN
-    headers = {'content-type': 'application/json', 'Authorization': TOKEN}
+        params['token'] = 'TOKEN'
+    headers = {'content-type': 'application/json', 'Authorization': 'TOKEN'}
     request = requests.post(url, params=params, data=dumps(data), headers=headers)
     if 200 <= request.status_code < 300:  # Response OK
         print('data posted successfully')
@@ -39,12 +40,17 @@ def get_text(url):
 
 
 def scrap_data(url):
+    # somewhere in here need for loop to post
     print('scraping data started')
     req = requests.get(source + url + api)  # getting articles from source for example: cnn, bbc-news, cnbc, etc
     dict_source = loads(req.text)  # reading the content (json format) from source
+    if 'error'in req.text:
+        print(dict_source['message'])
+        print('If source is correct try replacing all space with - character')
+        return
     links = []  # list used to store urls
     for article in dict_source['articles']:
-        print('scraping:', article['url'])
+        #print('scraping:', article['url'])
         dict_url = {}  # dictionary
         dict_url['url'] = article['url']  # create dictionary with -key url- and value is the link/url
         dict_url['title'] = article['title']  # add title to dictionary, same for next 3 lines
@@ -56,28 +62,9 @@ def scrap_data(url):
     article_dictionary = {}
     article_dictionary['source'] = url  # outer dictionary that display where the source of article came from
     article_dictionary['articles'] = links  # making the list of dictionary created above into articles value
-    return article_dictionary  # return dictionary that contain [{url: value}, {text:value}] formatted like this for converting to json format
+    data = json.dumps(article_dictionary) # convert dictionary into json string or format
+    #print(data)
+    #send_post_req(server, data, None)  # post data to server
 
-
-def convert2json(dir, name, data):  # function to write/saved json file
-    directory = './' + dir + '/' + name + '.json'  # ./ is to saved .json file to current directory
-    with open(directory, 'w') as filejson:
-        json.dump(data, filejson)
-
-# save scraped information into variable
-
-# output real articles data in json format to a .json file name example
-
-if __name__ == '__main__':
-    convert2json('./', 'example', scrap_data('cnn')) 
-
-
-# make one list of dictionaryS and inside those dictionaryS have 5 key url, title, text, date, and image
-# i need to do dictionary with key that has a dictionary value exampe dict {article: {url: value, text: value, etc}}
-
+scrap_data('bbc-news')
 #        if article['publishedAt']:  # only add to dictionary if there is a published date/time
-
-# create function scrap then call inside of for
-# store everything in dict
-# after scracping convert to json
-## send to node.js using request
