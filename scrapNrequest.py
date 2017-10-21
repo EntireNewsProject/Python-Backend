@@ -11,14 +11,14 @@ SLEEP_TIME_IN_SEC = 1
 SLEEP_TIME_IN_MILI_SEC = 0.3
 
 
-def send_post_req(url, data, params=None):
+def send_post_req(url, data1, params=None):
     print('send post req')
     if params is None:
-        params = {'token': 'TOKEN'}  # params = { 'token': XXX }
+        params = {'token': 'JNuhg6B7T8jhj8Y68KNKh'}  # params = { 'token': XXX }
     else:
-        params['token'] = 'TOKEN'
-    headers = {'content-type': 'application/json', 'Authorization': 'TOKEN'}
-    request = requests.post(url, params=params, data=dumps(data), headers=headers)
+        params['token'] = 'JNuhg6B7T8jhj8Y68KNKh'
+    headers = {'content-type': 'application/json', 'Authorization': 'JNuhg6B7T8jhj8Y68KNKh'}
+    request = requests.post(url, params=params, data=data1, headers=headers)
     if 200 <= request.status_code < 300:  # Response OK
         print('data posted successfully')
     else:
@@ -64,7 +64,7 @@ def scrap_data(url):
     article_dictionary['articles'] = links  # making the list of dictionary created above into articles value
     data = json.dumps(article_dictionary) # convert dictionary into json string or format
     #print(data)
-    #send_post_req(server, data, None)  # post data to server
+    send_post_req(server, data, None)  # post data to server
 
 scrap_data('bbc-news')
 #        if article['publishedAt']:  # only add to dictionary if there is a published date/time
