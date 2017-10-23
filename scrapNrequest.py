@@ -4,6 +4,9 @@ import json
 from json import loads, dumps
 from time import sleep
 
+dup_key = []  # contain links of news sources that is already scrap
+# need to automat  the scrap
+
 source = "https://newsapi.org/v1/articles?source="
 api = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
 server = "http://entirenews.tk:3000/api/news?source=bbc-news"
@@ -11,6 +14,7 @@ SLEEP_TIME_IN_SEC = 1
 SLEEP_TIME_IN_MILI_SEC = 0.3
 
 
+# token is needed
 def send_post_req(url, data1, params=None):
     print('send post req')
     if params is None:
@@ -39,41 +43,52 @@ def get_text(url):
     return article.text  # returns the content of url passed in
 
 
+def dupicate_checking(array):
+    for key in array:
+        if key != dup_key:
+            dup_key.append(array)
+            return True
+        else:
+            print('Already have that url in key')
+            return False
+
+
 def scrap_data(url):
     # somewhere in here need for loop to post
     print('scraping data started')
     req = requests.get(source + url + api)  # getting articles from source for example: cnn, bbc-news, cnbc, etc
     dict_source = loads(req.text)  # reading the content (json format) from source
-    if 'error'in req.text:
+    if 'error' in req.text:
         print(dict_source['message'])
         print('If source is correct try replacing all space with - character')
         return
     links = []  # list used to store urls
     for article in dict_source['articles']:
-        #print('scraping:', article['url'])
+        # print('scraping:', article['url'])
         dict_url = {}  # dictionary
         dict_url['source'] = url
-        #dict_url['url'] = article['url']  # create dictionary with -key url- and value is the link/url
+        dict_url['url'] = article['url']  # create dictionary with -key url- and value is the link/url
         dict_url['title'] = article['title']  # add title to dictionary, same for next 3 lines
         dict_url['article'] = get_text(article['url'])
         dict_url['cover'] = article['urlToImage']
         dict_url['date'] = article['publishedAt']
-        #dict_url['keywords']
-        #dict_url['tags']
+        # dict_url['keywords']
+        # dict_url['tags']
         data = json.dumps(dict_url)
-        send_post_req(server, data)
-        #print(data)
-
-        #links.append(dict_url)  # combine the all the url from the dictionary created above and store them in a list call links
+        if dupicate_checking(article['url']):
+            print('test successful')
+            #    send_post_req(server, data)
+            # print(data)
     print('scraping data end')
-    #article_dictionary = {}
-    #article_dictionary['sources'] = url  # outer dictionary that display where the source of article came from
-    #article_dictionary['articles'] = links  # making the list of dictionary created above into articles value
-    #data = json.dumps(article_dictionary) # convert dictionary into json string or format
+    # data = json.dumps(article_dictionary) # convert dictionary into json string or format
+    # links.append(dict_url)  # get url links and attach source name as key
 
 
-scrap_data('bild')
+scrap_data('cnn')
+print(dup_key)
+
 
 # need tags, keywords, url & date
+# abc, techcrunch, bbc, bloombreg, businesinsider, buzzfeed, cnn, cnbc, hacker news, reuters, nyt, the verge, time, usa today
 
 #        if article['publishedAt']:  # only add to dictionary if there is a published date/time
