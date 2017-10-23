@@ -52,19 +52,24 @@ def scrap_data(url):
     for article in dict_source['articles']:
         #print('scraping:', article['url'])
         dict_url = {}  # dictionary
-        dict_url['url'] = article['url']  # create dictionary with -key url- and value is the link/url
+        #dict_url['url'] = article['url']  # create dictionary with -key url- and value is the link/url
         dict_url['title'] = article['title']  # add title to dictionary, same for next 3 lines
         dict_url['text'] = get_text(article['url'])
-        dict_url['image'] = article['urlToImage']
-        dict_url['updated'] = article['publishedAt']
+        dict_url['cover'] = article['urlToImage']
+        dict_url['date'] = article['publishedAt']
+        dict_url['source'] = url
+        dict_url['article'] = 'some string'
         links.append(dict_url)  # combine the all the url from the dictionary created above and store them in a list call links
     print('scraping data end')
     article_dictionary = {}
-    article_dictionary['source'] = url  # outer dictionary that display where the source of article came from
+    article_dictionary['sources'] = url  # outer dictionary that display where the source of article came from
     article_dictionary['articles'] = links  # making the list of dictionary created above into articles value
     data = json.dumps(article_dictionary) # convert dictionary into json string or format
-    #print(data)
+    print(data)
     send_post_req(server, data, None)  # post data to server
 
 scrap_data('bbc-news')
+
+
+
 #        if article['publishedAt']:  # only add to dictionary if there is a published date/time
