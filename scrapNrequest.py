@@ -51,7 +51,7 @@ def dupicate_checking(array):
         else:
             print('Already have that url in key')
             return False
-# adding some comments 
+# adding some comments
 
 def scrap_data(url):
     # somewhere in here need for loop to post
