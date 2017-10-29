@@ -3,7 +3,7 @@ from newspaper import Article
 import json
 from json import loads, dumps
 from time import sleep
-
+from pathlib import Path
 dup_key = []  # contain links of news sources that is already scrap
 # need to automat  the scrap
 
@@ -35,6 +35,10 @@ def send_post_req(url, data1, params=None):
 
 
 def get_text(url):
+    # if url start with bbc
+    # then check first \n
+    # if it contain
+    # replace \n\n\n - \n\n
     article = Article(url)
     article.download()
     sleep(SLEEP_TIME_IN_MILI_SEC)
@@ -43,18 +47,16 @@ def get_text(url):
     return article.text  # returns the content of url passed in
 
 
-def dupicate_checking(array):
-    for key in array:
-        if key != dup_key:
-            dup_key.append(array)
-            return True
-        else:
-            print('Already have that url in key')
-            return False
+def dupicate_checking(key):
+    if key not in dup_key:
+        dup_key.append(key)
+        return True
+    else:
+        print('This URL has already been scraped')
+        return False
 
 
 def scrap_data(url):
-    # somewhere in here need for loop to post
     print('scraping data started')
     req = requests.get(source + url + api)  # getting articles from source for example: cnn, bbc-news, cnbc, etc
     dict_source = loads(req.text)  # reading the content (json format) from source
@@ -62,7 +64,6 @@ def scrap_data(url):
         print(dict_source['message'])
         print('If source is correct try replacing all space with - character')
         return
-    links = []  # list used to store urls
     for article in dict_source['articles']:
         # print('scraping:', article['url'])
         dict_url = {}  # dictionary
@@ -77,15 +78,29 @@ def scrap_data(url):
         data = json.dumps(dict_url)
         if dupicate_checking(article['url']):
             print('test successful')
-            #    send_post_req(server, data)
-            # print(data)
+            # send_post_req(server, data)
     print('scraping data end')
-    # data = json.dumps(article_dictionary) # convert dictionary into json string or format
-    # links.append(dict_url)  # get url links and attach source name as key
 
 
-scrap_data('cnn')
-print(dup_key)
+def write_url_keys(data):
+    directory = '././'+ '/' + 'duplicate' + '.txt'          # write file in the current directory
+    with open(directory, 'a') as writefile:
+        writefile.write(str(data))
+
+
+def read_url_keys():
+    directory = Path('././'+ '/' + 'duplicate' + '.txt')    # directory of the current path
+    if directory.is_file():                         # check if file in the current directory exist
+        with open(directory, 'r') as readfile:
+            return readfile.read()                  # return the string/array stored in file
+    else:
+        f = open('././/duplicate.txt', 'w')         # create file if does not exist
+        f.close()
+
+# main function
+# dup_key = read_url_keys()                           # save file string into dup key array
+# scrap_data('cnbc')
+# save(dup_key)
 
 
 # need tags, keywords, url & date
