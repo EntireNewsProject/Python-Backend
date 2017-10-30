@@ -47,6 +47,20 @@ def get_text(url):
     return article.text  # returns the content of url passed in
 
 
+def get_keywords(url):
+    article = Article(url)
+    article.download()
+    sleep(SLEEP_TIME_IN_MILI_SEC)
+    article.parse()
+    sleep(SLEEP_TIME_IN_MILI_SEC)
+    keyw = ''
+    for temp in article.meta_keywords:
+        keyw = keyw + temp
+    return article.html
+
+#print(get_keywords('http://www.cnn.com/2017/10/29/politics/angus-king-collusion-calls-sotu/index.html'))
+
+
 def dupicate_checking(key):
     if key not in dup_key:
         dup_key.append(key)
@@ -58,8 +72,8 @@ def dupicate_checking(key):
 
 def scrap_data(url):
     print('scraping data started')
-    req = requests.get(source + url + api)  # getting articles from source for example: cnn, bbc-news, cnbc, etc
-    dict_source = loads(req.text)  # reading the content (json format) from source
+    req = requests.get(source + url + api)                      # getting articles from source for example: cnn, bbc-news, cnbc, etc
+    dict_source = loads(req.text)                               # reading the content (json format) from source
     if 'error' in req.text:
         print(dict_source['message'])
         print('If source is correct try replacing all space with - character')
@@ -68,42 +82,72 @@ def scrap_data(url):
         # print('scraping:', article['url'])
         dict_url = {}  # dictionary
         dict_url['source'] = url
-        dict_url['url'] = article['url']  # create dictionary with -key url- and value is the link/url
-        dict_url['title'] = article['title']  # add title to dictionary, same for next 3 lines
+        dict_url['url'] = article['url']                        # create dictionary with -key url- and value is the link/url
+        dict_url['title'] = article['title']                    # add title to dictionary, same for next 3 lines
         dict_url['article'] = get_text(article['url'])
         dict_url['cover'] = article['urlToImage']
         dict_url['date'] = article['publishedAt']
-        # dict_url['keywords']
-        # dict_url['tags']
+        # dict_url['keywords'] = get_keywords(article['url'])
+        # dict_url['tags'] = get_tags(article['url'])
         data = json.dumps(dict_url)
         if dupicate_checking(article['url']):
-            print('test successful')
-            # send_post_req(server, data)
+            # print('test successful')
+            send_post_req(server, data)
     print('scraping data end')
 
 
 def write_url_keys(data):
-    directory = '././'+ '/' + 'duplicate' + '.txt'          # write file in the current directory
+    directory = '././'+ '/' + 'duplicate' + '.py'                # write file in the current directory
     with open(directory, 'a') as writefile:
-        writefile.write(str(data))
+        print('this is writing file to ', data)
+        writefile.writelines(data)
 
 
 def read_url_keys():
-    directory = Path('././'+ '/' + 'duplicate' + '.txt')    # directory of the current path
-    if directory.is_file():                         # check if file in the current directory exist
+    directory = Path('././'+ '/' + 'duplicate' + '.py')          # directory of the current path
+    if directory.is_file():                                      # check if file in the current directory exist
         with open(directory, 'r') as readfile:
-            return readfile.read()                  # return the string/array stored in file
+            for x in readfile.readline():
+                dup_key.append(x)
     else:
-        f = open('././/duplicate.txt', 'w')         # create file if does not exist
-        f.close()
+        with open('././/duplicate.py', 'w+') as f:               # create file if does not exist
+            return f.readline()
 
+
+# print('this is dup key',dup_key)
+# a= ['apple','banna','grape']
+# b = {}
+# b['fruit']= a
+# print('b',b)
+# c = 'one','two'
+# print('c',c)
+# d =['1','3','sdakfj']
+# d.append(c)
+# print(d)
 # main function
-# dup_key = read_url_keys()                           # save file string into dup key array
-# scrap_data('cnbc')
-# save(dup_key)
-
-
-# need tags, keywords, url & date
-# abc, techcrunch, bbc, bloombreg, businesinsider, buzzfeed, cnn, cnbc, hacker news, reuters, nyt, the verge, time, usa today
+# print('dup key should be empty', dup_key)
+# dup_key = read_url_keys()                   # save file string into dup key array
+# print('this is dup key after reading ',dup_key)
+# print('dup key after scrap',dup_key)
+# write_url_keys(dup_key)
+# print('write to file')
 
 #        if article['publishedAt']:  # only add to dictionary if there is a published date/time
+
+
+scrap_data('bbc-news')
+scrap_data('bloomberg')
+scrap_data('business-insider')
+scrap_data('buzzfeed')
+scrap_data('cnn')
+scrap_data('cnbc')
+scrap_data('engadget')
+scrap_data('espn')
+scrap_data('hacker-news')
+scrap_data('reuters')
+scrap_data('techcrunch')
+scrap_data('techradar')
+scrap_data('the-new-york-times')
+scrap_data('the-verge')
+scrap_data('time')
+scrap_data('usa-today')
