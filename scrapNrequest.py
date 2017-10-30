@@ -1,3 +1,4 @@
+import sys
 import requests
 from newspaper import Article
 import json
@@ -134,20 +135,61 @@ def read_url_keys():
 
 #        if article['publishedAt']:  # only add to dictionary if there is a published date/time
 
+def save_array():
+    global dup_key
+    file = open('dup_key.db', 'w')
+    for links in dup_key:
+        file.write("%s\n" % links)
+    file.close()
+    print('backup done')
 
-scrap_data('bbc-news')
-scrap_data('bloomberg')
-scrap_data('business-insider')
-scrap_data('buzzfeed')
-scrap_data('cnn')
-scrap_data('cnbc')
-scrap_data('engadget')
-scrap_data('espn')
-scrap_data('hacker-news')
-scrap_data('reuters')
-scrap_data('techcrunch')
-scrap_data('techradar')
-scrap_data('the-new-york-times')
-scrap_data('the-verge')
-scrap_data('time')
-scrap_data('usa-today')
+
+def read_array():
+    global dup_key
+    try:
+        file = open('dup_key.db', 'r')
+    except IOError:
+        print('backup not found, ignored')
+    else:
+        with file:
+            dup_key = file.read().splitlines()
+            file.close()
+            print('read backup successfully')
+            
+
+def main(argv):
+    # argv[0]: source
+    if len(argv) == 1:
+        read_array()
+        scrap_data(argv[0])
+        save_array()
+    else:
+        print('RuntimeError: incorrect number of args')
+        sys.exit()
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
+
+# run like
+# python scrapNrequest.py bbc-news
+# python scrapNrequest.py bloomberg
+# python scrapNrequest.py business-insider
+# etc.
+
+# scrap_data('bbc-news')
+# scrap_data('bloomberg')
+# scrap_data('business-insider')
+# scrap_data('buzzfeed')
+# scrap_data('cnn')
+# scrap_data('cnbc')
+# scrap_data('engadget')
+# scrap_data('espn')
+# scrap_data('hacker-news')
+# scrap_data('reuters')
+# scrap_data('techcrunch')
+# scrap_data('techradar')
+# scrap_data('the-new-york-times')
+# scrap_data('the-verge')
+# scrap_data('time')
+# scrap_data('usa-today')
