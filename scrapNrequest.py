@@ -1,10 +1,10 @@
 import sys
 import requests
-from newspaper import Article
+from newspaper import Article, fulltext
 import json
 from json import loads, dumps
 from time import sleep
-from pathlib import Path
+import re
 dup_key = []  # contain links of news sources that is already scrap
 # need to automat  the scrap
 
@@ -34,30 +34,34 @@ def send_post_req(url, data1, params=None):
             print('failed to post data, code:', request.status_code)
     print()  # blank line
 
+def get_news(url):
+    article = Article(url)
+    article.download()
+    sleep(SLEEP_TIME_IN_MILI_SEC)
+    article.parse()
+    sleep(SLEEP_TIME_IN_MILI_SEC)
+    return article
 
-def get_text(url):
+def get_text(article):
+    string = r'(Image copyright).+'
+    text = article.text#.replace('\n\n\n','\n\n')
+    matched = re.finditer(string,text)
+    for matchNum,match in enumerate(matched):
+        text = text.replace(match.group(),'')
+    text = text.replace('\n\n\n', '\n\n')
+    text = text.replace('\n\n\n', '\n\n')
     # if url start with bbc
     # then check first \n
     # if it contain
     # replace \n\n\n - \n\n
-    article = Article(url)
-    article.download()
-    sleep(SLEEP_TIME_IN_MILI_SEC)
-    article.parse()
-    sleep(SLEEP_TIME_IN_MILI_SEC)
-    return article.text  # returns the content of url passed in
+    return text  # returns the content of url passed in
+
+test = 'http://www.bbc.co.uk/news/world-asia-41840866'
+get_text(get_news(test))
 
 
-def get_keywords(url):
-    article = Article(url)
-    article.download()
-    sleep(SLEEP_TIME_IN_MILI_SEC)
-    article.parse()
-    sleep(SLEEP_TIME_IN_MILI_SEC)
-    keyw = ''
-    for temp in article.meta_keywords:
-        keyw = keyw + temp
-    return article.html
+def get_keywords(article):
+    return article.keywords
 
 #print(get_keywords('http://www.cnn.com/2017/10/29/politics/angus-king-collusion-calls-sotu/index.html'))
 
@@ -70,70 +74,42 @@ def dupicate_checking(key):
         print('This URL has already been scraped')
         return False
 
+def check_article_length(content):
+    if len(content) < 300:
+        print('This text has less than 300 character')
+        print(content)
+        return False
+    else:
+        return True
+
 
 def scrap_data(url):
     print('scraping data started')
     req = requests.get(source + url + api)                      # getting articles from source for example: cnn, bbc-news, cnbc, etc
     dict_source = loads(req.text)                               # reading the content (json format) from source
-    if 'error' in req.text:
-        print(dict_source['message'])
-        print('If source is correct try replacing all space with - character')
-        return
+    # if 'error' in req.text:
+    #     print('If source is correct try replacing all space with - character')
+    #     return
     for article in dict_source['articles']:
-        # print('scraping:', article['url'])
-        dict_url = {}  # dictionary
-        dict_url['source'] = url
-        dict_url['url'] = article['url']                        # create dictionary with -key url- and value is the link/url
-        dict_url['title'] = article['title']                    # add title to dictionary, same for next 3 lines
-        dict_url['article'] = get_text(article['url'])
-        dict_url['cover'] = article['urlToImage']
-        dict_url['date'] = article['publishedAt']
-        # dict_url['keywords'] = get_keywords(article['url'])
-        # dict_url['tags'] = get_tags(article['url'])
-        data = json.dumps(dict_url)
         if dupicate_checking(article['url']):
-            # print('test successful')
-            send_post_req(server, data)
+            news = get_news(article['url'])
+            text = get_text(news)
+            if check_article_length(text):
+                # print('scraping:', article['url'])
+                dict_url = {}  # dictionary
+                dict_url['source'] = url
+                dict_url['url'] = article['url']                        # create dictionary with -key url- and value is the link/url
+                dict_url['title'] = article['title']                    # add title to dictionary, same for next 3 lines
+                dict_url['article'] = text
+                dict_url['cover'] = article['urlToImage']
+                dict_url['date'] = article['publishedAt']
+                # dict_url['keywords'] = get_keywords(news)
+                # dict_url['tags'] = get_tags(news)
+                data = json.dumps(dict_url)
+                print('test successful')
+                send_post_req(server, data)
     print('scraping data end')
 
-
-def write_url_keys(data):
-    directory = '././'+ '/' + 'duplicate' + '.py'                # write file in the current directory
-    with open(directory, 'a') as writefile:
-        print('this is writing file to ', data)
-        writefile.writelines(data)
-
-
-def read_url_keys():
-    directory = Path('././'+ '/' + 'duplicate' + '.py')          # directory of the current path
-    if directory.is_file():                                      # check if file in the current directory exist
-        with open(directory, 'r') as readfile:
-            for x in readfile.readline():
-                dup_key.append(x)
-    else:
-        with open('././/duplicate.py', 'w+') as f:               # create file if does not exist
-            return f.readline()
-
-
-# print('this is dup key',dup_key)
-# a= ['apple','banna','grape']
-# b = {}
-# b['fruit']= a
-# print('b',b)
-# c = 'one','two'
-# print('c',c)
-# d =['1','3','sdakfj']
-# d.append(c)
-# print(d)
-# main function
-# print('dup key should be empty', dup_key)
-# dup_key = read_url_keys()                   # save file string into dup key array
-# print('this is dup key after reading ',dup_key)
-# print('dup key after scrap',dup_key)
-# write_url_keys(dup_key)
-# print('write to file')
-
-#        if article['publishedAt']:  # only add to dictionary if there is a published date/time
 
 def save_array():
     global dup_key
@@ -163,6 +139,7 @@ def main(argv):
         read_array()
         scrap_data(argv[0])
         save_array()
+        # exit
     else:
         print('RuntimeError: incorrect number of args')
         sys.exit()
@@ -172,7 +149,6 @@ if __name__ == '__main__':
     main(sys.argv[1:])
 
 # run like
-# python scrapNrequest.py bbc-news
 # python scrapNrequest.py bloomberg
 # python scrapNrequest.py business-insider
 # etc.
