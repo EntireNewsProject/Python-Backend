@@ -6,6 +6,9 @@ from json import loads, dumps
 from time import sleep
 import re
 
+URL_API = 'http://listeapp.tk/api'
+TOKEN = ''
+
 dup_key = []  # contain links of news sources that is already scrap
 
 source = "https://newsapi.org/v1/articles?source="
@@ -138,8 +141,64 @@ def read_array():                               # read stored url string
             print('read backup successfully')
 
 
+def req_login(username, password):
+    print('logging in...')
+    url = URL_API + '/login'
+    payload = {'username': username, 'password': password}
+    headers = {'content-type': 'application/json'}
+    request = requests.post(url, data=dumps(payload), headers=headers)
+    if request.status_code == 200:
+        print('logged in successfully as:', request.json()['user']['_id'])
+        print('received new token from server')
+        global TOKEN
+        TOKEN = request.json()['token']
+        file = open('token.txt', 'w')
+        file.write(TOKEN)
+        file.close()
+        print('token updated')
+    else:
+        print('failed to logged in, status code:', request.status_code)
+        # print(request.json())
+
+
+def req_me():
+    print('get me...')
+    url = URL_API + '/me'
+    global TOKEN
+    headers = {'content-type': 'application/json', 'Authorization': TOKEN}
+    request = requests.get(url, headers=headers)
+    if request.status_code == 200:
+        print('received new token from server')
+        TOKEN = request.json()['token']
+        file = open('token.txt', 'w')
+        file.write(TOKEN)
+        file.close()
+        print('token updated')
+    else:
+        print('token expired...')
+        req_login('entirenews_py', '123456')
+
+
+def read_token():
+    print('read saved token...')
+    global TOKEN
+    try:
+        file = open('token.txt', 'r')
+    except IOError:
+        print('token not found, requesting new token')
+        req_login('entirenews_py', '123456')
+    else:
+        with file:
+            TOKEN = file.read()
+            file.close()
+            print('read token successful')
+            req_me()
+
+            
+
 def main(argv):
     if len(argv) == 1:
+        read_token()
         read_array()
         scrap_data(argv[0])                     # argv[0]: source
         save_array()
