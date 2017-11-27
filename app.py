@@ -196,7 +196,7 @@ def read_token():
 
 
 if __name__ == '__main__':
-    # read_token()
+    read_token()
     read_array()
     for src in SOURCES:
         scrap_data(src)
