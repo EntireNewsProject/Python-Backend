@@ -1,4 +1,3 @@
-import sys
 import requests
 from newspaper import Article
 import json
@@ -6,8 +5,8 @@ from json import loads, dumps
 from time import sleep
 import re
 
-URL_API = 'http://entirenews.tk:3000'
-# URL_API = 'http://localhost:3000'
+# URL_API = 'http://entirenews.tk:3000'
+URL_API = 'http://localhost:3000'
 TOKEN = ''
 DUPLICATE_KEYS = []  # contain links of news sources that is already scrap
 URL_NEWAPI = "https://newsapi.org/v1/articles?source="
