@@ -1,29 +1,32 @@
 import sys
 import requests
-from newspaper import Article, fulltext
+from newspaper import Article
 import json
 from json import loads, dumps
 from time import sleep
 import re
 
-URL_API = 'http://entirenews.tk:3000/api'
+URL_API = 'http://entirenews.tk:3000'
+# URL_API = 'http://localhost:3000'
 TOKEN = ''
 DUPLICATE_KEYS = []  # contain links of news sources that is already scrap
 URL_NEWAPI = "https://newsapi.org/v1/articles?source="
 API_KEY = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
+SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnn', 'engadget', 'espn', 'hacker-news', 'reuters',
+           'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
 
 SLEEP_TIME_IN_SEC = 1
 SLEEP_TIME_IN_MILI_SEC = 0.3
 
 
 # token is needed
-def send_post_req(url, data1, params=None):
+def send_post_req(url, data, params = None):
     print('send post req')
     if params is None:
-        params = {}  # params = { 'token': XXX }
-        url = URL_API + url;
+        params = {}
+        url = URL_API + url
     headers = {'content-type': 'application/json', 'Authorization': TOKEN}
-    request = requests.post(url, params=params, data=data1, headers=headers)
+    request = requests.post(url, params = params, data = data, headers = headers)
     if 200 <= request.status_code < 300:  # Response OK
         print('data posted successfully')
     else:
@@ -112,7 +115,7 @@ def scrap_data(url):
                 # dict_url['keywords'] = get_keywords(news)
                 # dict_url['tags'] = get_tags(news)
                 data = json.dumps(dict_url)
-                send_post_req('/news', data)
+                send_post_req('/api/news', data)
                 print('Posting article done')
     print('scraping data end')
 
@@ -141,10 +144,10 @@ def read_array():  # read stored url string
 
 def req_login(username, password):
     print('logging in...')
-    url = URL_API + '/login'
+    url = URL_API + '/user/login'
     payload = {'username': username, 'password': password}
     headers = {'content-type': 'application/json'}
-    request = requests.post(url, data=dumps(payload), headers=headers)
+    request = requests.post(url, data = dumps(payload), headers = headers)
     if request.status_code == 200:
         print('logged in successfully as:', request.json()['user']['_id'])
         print('received new token from server')
@@ -161,10 +164,10 @@ def req_login(username, password):
 
 def req_me():
     print('get me...')
-    url = URL_API + '/me'
+    url = URL_API + '/user/authenticate'
     global TOKEN
     headers = {'content-type': 'application/json', 'Authorization': TOKEN}
-    request = requests.get(url, headers=headers)
+    request = requests.get(url, headers = headers)
     if request.status_code == 200:
         print('received new token from server')
         TOKEN = request.json()['token']
@@ -193,23 +196,17 @@ def read_token():
             req_me()
 
 
-def main(argv):
-    if len(argv) == 1:
-        read_token()
-        read_array()
-        scrap_data(argv[0])  # argv[0]: source
-        save_array()
-    else:
-        print('RuntimeError: incorrect number of args')
-        sys.exit()
-
-
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    # read_token()
+    read_array()
+    for src in SOURCES:
+        scrap_data(src)
+    save_array()
+
 
 # run like
-# python scrapNrequest.py bloomberg
-# python scrapNrequest.py business-insider
+# python app.py bloomberg
+# python app.py business-insider
 # etc.
 
 # scrap_data('bbc-news')
