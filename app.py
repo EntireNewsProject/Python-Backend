@@ -4,6 +4,7 @@ import json
 from json import loads, dumps
 from time import sleep
 import re
+import os
 
 # URL_API = 'http://entirenews.tk:3000'
 URL_API = 'http://localhost:3000'
@@ -131,7 +132,9 @@ def save_array():  # save url string
 def read_array():  # read stored url string
     global DUPLICATE_KEYS
     try:
-        file = open('dup_key.db', 'r')
+        fileDir = os.path.dirname(os.path.realpath('__file__'))
+        filename = os.path.join(fileDir, 'dup_key.db')
+        file = open(filename, 'r')
     except IOError:
         print('backup not found, ignored')
     else:
@@ -148,7 +151,7 @@ def req_login(username, password):
     headers = {'content-type': 'application/json'}
     request = requests.post(url, data = dumps(payload), headers = headers)
     if request.status_code == 200:
-        print('logged in successfully as:', request.json()['user']['_id'])
+        print('logged in successfully')
         print('received new token from server')
         global TOKEN
         TOKEN = request.json()['token']
@@ -196,7 +199,7 @@ def read_token():
 
 
 if __name__ == '__main__':
-    read_token()
+    #read_token()
     read_array()
     for src in SOURCES:
         scrap_data(src)
