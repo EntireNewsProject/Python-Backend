@@ -134,6 +134,7 @@ def read_array():  # read stored url string
     try:
         fileDir = os.path.dirname(os.path.realpath('__file__'))
         filename = os.path.join(fileDir, 'dup_key.db')
+        print(filename)
         file = open(filename, 'r')
     except IOError:
         print('backup not found, ignored')
