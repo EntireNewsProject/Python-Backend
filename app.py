@@ -4,7 +4,6 @@ import json
 from json import loads, dumps
 from time import sleep
 import re
-import os
 
 # URL_API = 'http://entirenews.tk:3000'
 URL_API = 'http://localhost:3000'
@@ -132,10 +131,7 @@ def save_array():  # save url string
 def read_array():  # read stored url string
     global DUPLICATE_KEYS
     try:
-        fileDir = os.path.dirname(os.path.realpath('__file__'))
-        filename = os.path.join(fileDir, 'dup_key.db')
-        print(filename)
-        file = open(filename, 'r')
+        file = open('/home/ubuntu/apps/python/dup_key.db', 'r')
     except IOError:
         print('backup not found, ignored')
     else:
