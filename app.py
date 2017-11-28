@@ -1,10 +1,11 @@
-#!/usr/bin/python
 import requests
 from newspaper import Article
 import json
 from json import loads, dumps
 from time import sleep
 import re
+import schedule
+import time
 
 # URL_API = 'http://entirenews.tk:3000'
 URL_API = 'http://localhost:3000'
@@ -196,32 +197,18 @@ def read_token():
             req_me()
 
 
-if __name__ == '__main__':
-    #read_token()
+def job():
+    # read_token()
     read_array()
     for src in SOURCES:
         scrap_data(src)
     save_array()
 
 
-# run like
-# python app.py bloomberg
-# python app.py business-insider
-# etc.
+schedule.every(10).seconds.do(job)
 
-# scrap_data('bbc-news')
-# scrap_data('bloomberg')
-# scrap_data('business-insider')
-# scrap_data('buzzfeed')
-# scrap_data('cnn')
-# scrap_data('cnbc')
-# scrap_data('engadget')
-# scrap_data('espn')
-# scrap_data('hacker-news')
-# scrap_data('reuters')
-# scrap_data('techcrunch')
-# scrap_data('techradar')
-# scrap_data('the-new-york-times')
-# scrap_data('the-verge')
-# scrap_data('time')
-# scrap_data('usa-today')
+
+if __name__ == '__main__':
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
