@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import requests
 from newspaper import Article
 import json
