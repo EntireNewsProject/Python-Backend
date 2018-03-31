@@ -3,6 +3,9 @@ import math
 
 import settings
 
+
+ideal = 20.0
+
 #Preparing for keyword function
 
 def split_words(text):
