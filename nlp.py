@@ -68,4 +68,4 @@ def title_score(title, sentence):
         return count / max(len(title), 1)
     else:
         return 0
-
+        #todo: sentence positioning and the score function
