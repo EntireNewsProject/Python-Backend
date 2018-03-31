@@ -1,5 +1,6 @@
 import re
 
+
 import settings
 
 #Preparing for keyword function
@@ -47,6 +48,7 @@ def keywords(text):
 
 
 def split_sentences(text):
+    import nltk.data
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
     sentences = tokenizer.tokenize(text)
     sentences = [x.replace('\n', '') for x in sentences if len(x) > 10]
