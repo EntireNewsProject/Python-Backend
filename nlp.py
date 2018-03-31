@@ -1,5 +1,5 @@
 import re
-
+import math
 
 import settings
 
@@ -40,8 +40,7 @@ def keywords(text):
 
         for k in keywords:
             articleScore = keywords[k] * 1.0 / max(num_words, 1)
-            keywords[k] = articleScore
-            #todo: normalize the article score
+            keywords[k] = articleScore * 1.5 + 1
         return dict(keywords)
     else:
         return dict()
