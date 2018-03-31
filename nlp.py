@@ -70,7 +70,7 @@ def title_score(title, sentence):
         return count / max(len(title), 1)
     else:
         return 0
-        #todo: sentence positioning and the score function
+        #todo: score function
 
 def sentence_position(i, size):
     normalized = i * 1.0 / size
