@@ -71,3 +71,30 @@ def title_score(title, sentence):
     else:
         return 0
         #todo: sentence positioning and the score function
+
+def sentence_position(i, size):
+    normalized = i * 1.0 / size
+    if (normalized > 1.0):
+        return 0
+    elif (normalized > 0.9):
+        return 0.15
+    elif (normalized > 0.8):
+        return 0.04
+    elif (normalized > 0.7):
+        return 0.04
+    elif (normalized > 0.6):
+        return 0.06
+    elif (normalized > 0.5):
+        return 0.04
+    elif (normalized > 0.4):
+        return 0.05
+    elif (normalized > 0.3):
+        return 0.08
+    elif (normalized > 0.2):
+        return 0.14
+    elif (normalized > 0.1):
+        return 0.23
+    elif (normalized > 0):
+        return 0.17
+    else:
+        return 0
