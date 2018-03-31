@@ -54,3 +54,18 @@ def split_sentences(text):
     sentences = [x.replace('\n', '') for x in sentences if len(x) > 10]
     return sentences
 
+def length_score(sentence_len):
+    return 1 - math.fabs(ideal - sentence_len) / ideal
+
+
+def title_score(title, sentence):
+    if title:
+        title = [x for x in title if x not in stopwords]
+        count = 0.0
+        for word in sentence:
+            if (word not in stopwords and word in title):
+                count += 1.0
+        return count / max(len(title), 1)
+    else:
+        return 0
+
