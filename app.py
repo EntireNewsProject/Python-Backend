@@ -180,7 +180,6 @@ def req_me():
         print('token expired...')
         req_login('entirenews_py', '123456')
 
-
 def read_token():
     print('read saved token...')
     global TOKEN
@@ -195,7 +194,6 @@ def read_token():
             file.close()
             print('read token successful')
             req_me()
-
 
 def job():
     # read_token()
