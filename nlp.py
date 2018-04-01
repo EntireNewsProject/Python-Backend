@@ -1,12 +1,58 @@
 import re
 import math
 
+
 import settings
 
 
 ideal = 20.0
 
 #Preparing for keyword function
+
+
+def load_stopwords():
+    global stopwords
+    stopwordsFile = settings.NLP_STOPWORDS_EN
+    with open(stopwordsFile, 'r', encoding='utf-8') as f:
+        stopwords.update(set([w.strip() for w in f.readlines()]))
+
+
+
+#Todo: @khushalJobanutra Add the Socre function -- sbs and dbs features.
+
+def sbs(words, keywords):
+    score = 0.0
+    if (len(words) == 0):
+        return 0
+    for word in words:
+        if word in keywords:
+            score += keywords[word]
+    return (1.0 / math.fabs(len(words)) * score) / 10.0
+
+
+def dbs(words, keywords):
+    if (len(words) == 0):
+        return 0
+    summ = 0
+    first = []
+    second = []
+
+    for i, word in enumerate(words):
+        if word in keywords:
+            score = keywords[word]
+            if first == []:
+                first = [i, score]
+            else:
+                second = first
+                first = [i, score]
+                dif = first[0] - second[0]
+                summ += (first[1] * second[1]) / (dif ** 2)
+    # Number of intersections
+    k = len(set(keywords.keys()).intersection(set(words))) + 1
+    return (1 / (k * (k + 1.0)) * summ)
+
+
+
 
 def split_words(text):
     try:
@@ -15,11 +61,6 @@ def split_words(text):
     except TypeError:
         return None
 
-def load_stopwords():
-    global stopwords
-    stopwordsFile = settings.NLP_STOPWORDS_EN
-    with open(stopwordsFile, 'r', encoding='utf-8') as f:
-        stopwords.update(set([w.strip() for w in f.readlines()]))
 
 def keywords(text):
     NUM_KEYWORDS = 10
@@ -70,7 +111,7 @@ def title_score(title, sentence):
         return count / max(len(title), 1)
     else:
         return 0
-        #todo: score function
+
 
 def sentence_position(i, size):
     normalized = i * 1.0 / size
