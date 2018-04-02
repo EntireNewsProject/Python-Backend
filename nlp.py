@@ -1,6 +1,6 @@
 import re
 import math
-
+from collections import Counter
 
 import settings
 
@@ -16,7 +16,21 @@ def load_stopwords():
     with open(stopwordsFile, 'r', encoding='utf-8') as f:
         stopwords.update(set([w.strip() for w in f.readlines()]))
 
-
+def score(sentences, titleWords, keywords):
+    senSize = len(sentences)
+    ranks = Counter()
+    for i, s in enumerate(sentences):
+        sentence = split_words(s)
+        titleFeature = title_score(titleWords, sentence)
+        sentenceLength = length_score(len(sentence))
+        sentencePosition = sentence_position(i + 1, senSize)
+        sbsFeature = sbs(sentence, keywords)
+        dbsFeature = dbs(sentence, keywords)
+        frequency = (sbsFeature + dbsFeature) / 2.0 * 10.0
+        totalScore = (titleFeature*1.5 + frequency*2.0 +
+                      sentenceLength*1.0 + sentencePosition*1.0)/4.0
+        ranks[(i, s)] = totalScore
+    return ranks
 
 #Todo: @khushalJobanutra Add the Socre function -- sbs and dbs features.
 
@@ -139,3 +153,4 @@ def sentence_position(i, size):
         return 0.17
     else:
         return 0
+
