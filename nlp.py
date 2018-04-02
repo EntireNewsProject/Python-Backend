@@ -16,6 +16,22 @@ def load_stopwords():
     with open(stopwordsFile, 'r', encoding='utf-8') as f:
         stopwords.update(set([w.strip() for w in f.readlines()]))
 
+def summarize(url='', title='', text='', max_sents=5):
+    if not text or not title or max_sents <= 0:
+        return []
+
+    summaries = []
+    sentences = split_sentences(text)
+    keys = keywords(text)
+    titleWords = split_words(title)
+
+    # Score sentences, and use the top 5 or max_sents sentences
+    ranks = score(sentences, titleWords, keys).most_common(max_sents)
+    for rank in ranks:
+        summaries.append(rank[0])
+    summaries.sort(key=lambda summary: summary[0])
+    return [summary[1] for summary in summaries]
+
 def score(sentences, titleWords, keywords):
     senSize = len(sentences)
     ranks = Counter()
@@ -31,8 +47,6 @@ def score(sentences, titleWords, keywords):
                       sentenceLength*1.0 + sentencePosition*1.0)/4.0
         ranks[(i, s)] = totalScore
     return ranks
-
-#Todo: @khushalJobanutra Add the Socre function -- sbs and dbs features.
 
 def sbs(words, keywords):
     score = 0.0
@@ -64,8 +78,6 @@ def dbs(words, keywords):
     # Number of intersections
     k = len(set(keywords.keys()).intersection(set(words))) + 1
     return (1 / (k * (k + 1.0)) * summ)
-
-
 
 
 def split_words(text):
