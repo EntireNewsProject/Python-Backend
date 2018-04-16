@@ -1,5 +1,3 @@
 import nlp
 
-class NewsApi(object):
-    def nlp(self):
-        self.set_summary(summary)
+class NewsApi:
