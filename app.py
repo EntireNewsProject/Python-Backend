@@ -6,7 +6,7 @@ from time import sleep
 import re
 import schedule
 import time
-import nlp
+import nlp as np
 
 # URL_API = 'http://entirenews.tk:3000'
 URL_API = 'http://localhost:3000'
@@ -93,14 +93,14 @@ def check_article_length(content):  # Only post articles that have more than 500
 
 
 def nlp(dict_url):
-    nlp.load_stopwords()
-    text_keyws = list(nlp.keywords(dict_url['article']).keys())
-    title_keyws = list(nlp.keywords(dict_url['title']).keys())
+    np.load_stopwords()
+    text_keyws = list(np.keywords(dict_url['article']).keys())
+    title_keyws = list(np.keywords(dict_url['title']).keys())
     keyws = list(set(title_keyws + text_keyws))
     dict_url['keywords'] = keyws
     max_sents = 5
 
-    summary_sents = nlp.summarize(title=dict_url['article'], text=dict_url['title'], max_sents=max_sents)
+    summary_sents = np.summarize(dict_url['article'], dict_url['title'], max_sents)
     summary = '\n'.join(summary_sents)
     dict_url['summary'] = summary
     return dict_url
@@ -110,6 +110,7 @@ def scrap_data(url):
     print('scraping data started')
     req = requests.get(URL_NEWAPI + url + API_KEY)  # getting articles from source for example: cnn, bbc-news, cnbc, etc
     dict_source = loads(req.text)  # reading the content (json format) from source
+    print(dict_source)
     if req.status_code == 400:  # If unable to find source then exit
         print('Source is incorrect or try replacing all spaces with " - " character')
         return
@@ -128,7 +129,9 @@ def scrap_data(url):
                 dict_url['article'] = text
                 dict_url['cover'] = article['urlToImage']
                 dict_url['date'] = article['publishedAt']
+                print(dict_url)
                 dict_url = nlp(dict_url)
+                print(dict_url)
                 # dict_url['keywords'] = get_keywords(news)
                 # dict_url['tags'] = get_tags(news)
                 data = json.dumps(dict_url)
@@ -221,7 +224,7 @@ def job():
     save_array()
 
 
-schedule.every(10).minutes.do(job)
+schedule.every(20).minutes.do(job)
 
 if __name__ == '__main__':
     while 1:
