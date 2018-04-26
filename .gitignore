@@ -67,5 +67,6 @@ fabric.properties
 # Sonarlint plugin
 .idea/sonarlint
 
+# dup_key.db
 
 # End of https://www.gitignore.io/api/pycharm

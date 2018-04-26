@@ -6,6 +6,7 @@ from time import sleep
 import re
 import schedule
 import time
+import nlp as np
 
 # URL_API = 'http://entirenews.tk:3000'
 URL_API = 'http://localhost:3000'
@@ -13,7 +14,7 @@ TOKEN = ''
 DUPLICATE_KEYS = []  # contain links of news sources that is already scrap
 URL_NEWAPI = "https://newsapi.org/v1/articles?source="
 API_KEY = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
-SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnn', 'engadget', 'espn', 'hacker-news', 'reuters',
+SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnbc', 'cnn', 'engadget', 'espn', 'hacker-news', 'reuters',
            'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
 
 SLEEP_TIME_IN_SEC = 1
@@ -21,13 +22,13 @@ SLEEP_TIME_IN_MILI_SEC = 0.3
 
 
 # token is needed
-def send_post_req(url, data, params = None):
+def send_post_req(url, data, params=None):
     print('send post req')
     if params is None:
         params = {}
         url = URL_API + url
     headers = {'content-type': 'application/json', 'Authorization': TOKEN}
-    request = requests.post(url, params = params, data = data, headers = headers)
+    request = requests.post(url, params=params, data=data, headers=headers)
     if 200 <= request.status_code < 300:  # Response OK
         print('data posted successfully')
     else:
@@ -91,10 +92,25 @@ def check_article_length(content):  # Only post articles that have more than 500
         return True
 
 
+def nlp(dict_url):
+    np.load_stopwords()
+    text_keyws = list(np.keywords(dict_url['article']).keys())
+    title_keyws = list(np.keywords(dict_url['title']).keys())
+    keyws = list(set(title_keyws + text_keyws))
+    dict_url['keywords'] = keyws
+    max_sents = 5
+
+    summary_sents = np.summarize(dict_url['article'], dict_url['title'], max_sents)
+    summary = '\n'.join(summary_sents)
+    dict_url['summary'] = summary
+    return dict_url
+
+
 def scrap_data(url):
     print('scraping data started')
     req = requests.get(URL_NEWAPI + url + API_KEY)  # getting articles from source for example: cnn, bbc-news, cnbc, etc
     dict_source = loads(req.text)  # reading the content (json format) from source
+    print(dict_source)
     if req.status_code == 400:  # If unable to find source then exit
         print('Source is incorrect or try replacing all spaces with " - " character')
         return
@@ -113,6 +129,9 @@ def scrap_data(url):
                 dict_url['article'] = text
                 dict_url['cover'] = article['urlToImage']
                 dict_url['date'] = article['publishedAt']
+                print(dict_url)
+                dict_url = nlp(dict_url)
+                print(dict_url)
                 # dict_url['keywords'] = get_keywords(news)
                 # dict_url['tags'] = get_tags(news)
                 data = json.dumps(dict_url)
@@ -148,7 +167,7 @@ def req_login(username, password):
     url = URL_API + '/user/login'
     payload = {'username': username, 'password': password}
     headers = {'content-type': 'application/json'}
-    request = requests.post(url, data = dumps(payload), headers = headers)
+    request = requests.post(url, data=dumps(payload), headers=headers)
     if request.status_code == 200:
         print('logged in successfully')
         print('received new token from server')
@@ -168,7 +187,7 @@ def req_me():
     url = URL_API + '/user/authenticate'
     global TOKEN
     headers = {'content-type': 'application/json', 'Authorization': TOKEN}
-    request = requests.get(url, headers = headers)
+    request = requests.get(url, headers=headers)
     if request.status_code == 200:
         print('received new token from server')
         TOKEN = request.json()['token']
@@ -179,6 +198,7 @@ def req_me():
     else:
         print('token expired...')
         req_login('entirenews_py', '123456')
+
 
 def read_token():
     print('read saved token...')
@@ -195,6 +215,7 @@ def read_token():
             print('read token successful')
             req_me()
 
+
 def job():
     # read_token()
     read_array()
@@ -203,8 +224,7 @@ def job():
     save_array()
 
 
-schedule.every(10).minutes.do(job)
-
+schedule.every(20).minutes.do(job)
 
 if __name__ == '__main__':
     while 1:
