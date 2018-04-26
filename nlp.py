@@ -7,8 +7,6 @@ import settings
 
 ideal = 20.0
 
-#Preparing for keyword function
-
 
 def load_stopwords():
     global stopwords
@@ -25,7 +23,6 @@ def summarize(url='', title='', text='', max_sents=5):
     keys = keywords(text)
     titleWords = split_words(title)
 
-    # Score sentences, and use the top 5 or max_sents sentences
     ranks = score(sentences, titleWords, keys).most_common(max_sents)
     for rank in ranks:
         summaries.append(rank[0])
