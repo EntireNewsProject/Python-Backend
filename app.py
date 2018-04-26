@@ -224,10 +224,9 @@ def job():
     save_array()
 
 
-# schedule.every(20).minutes.do(job)
+schedule.every(20).minutes.do(job)
 
 if __name__ == '__main__':
-    # while 1:
-    #     schedule.run_pending()
-    #     time.sleep(1)
-    job()
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
