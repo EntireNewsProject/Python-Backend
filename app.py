@@ -1,11 +1,12 @@
-import requests
-from newspaper import Article
 import json
+import re
+import time
 from json import loads, dumps
 from time import sleep
-import re
 import schedule
-import time
+import requests
+from newspaper import Article
+
 import nlp as np
 
 # URL_API = 'http://entirenews.tk:3000'
@@ -14,7 +15,8 @@ TOKEN = ''
 DUPLICATE_KEYS = []  # contain links of news sources that is already scrap
 URL_NEWAPI = "https://newsapi.org/v1/articles?source="
 API_KEY = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
-SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnbc', 'cnn', 'engadget', 'espn', 'hacker-news', 'reuters',
+SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnbc', 'cnn', 'engadget', 'espn', 'hacker-news',
+           'reuters',
            'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
 
 SLEEP_TIME_IN_SEC = 1
@@ -90,6 +92,18 @@ def check_article_length(content):  # Only post articles that have more than 500
         return False
     else:
         return True
+
+
+#def nlp_sum(article):
+    #return article.nlp()
+
+
+#def keywords(article):
+    #return article.keywords
+
+
+#def summary(article):
+    #return article.summary
 
 
 def nlp(dict_url):
