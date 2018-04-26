@@ -15,7 +15,7 @@ DUPLICATE_KEYS = []  # contain links of news sources that is already scrap
 URL_NEWAPI = "https://newsapi.org/v1/articles?source="
 API_KEY = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
 SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnbc', 'cnn', 'engadget', 'espn', 'hacker-news', 'reuters',
-           'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
+          'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
 
 SLEEP_TIME_IN_SEC = 1
 SLEEP_TIME_IN_MILI_SEC = 0.3
@@ -100,7 +100,7 @@ def nlp(dict_url):
     dict_url['keywords'] = keyws
     max_sents = 5
 
-    summary_sents = np.summarize(dict_url['article'], dict_url['title'], max_sents)
+    summary_sents = np.summarize(dict_url['title'], dict_url['article'], max_sents)
     summary = '\n'.join(summary_sents)
     dict_url['summary'] = summary
     return dict_url
