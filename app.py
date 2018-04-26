@@ -1,12 +1,11 @@
-import json
-import re
-import time
-from json import loads, dumps
-from time import sleep
-import schedule
 import requests
 from newspaper import Article
-
+import json
+from json import loads, dumps
+from time import sleep
+import re
+import schedule
+import time
 import nlp as np
 
 # URL_API = 'http://entirenews.tk:3000'
@@ -15,9 +14,8 @@ TOKEN = ''
 DUPLICATE_KEYS = []  # contain links of news sources that is already scrap
 URL_NEWAPI = "https://newsapi.org/v1/articles?source="
 API_KEY = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
-SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnbc', 'cnn', 'engadget', 'espn', 'hacker-news',
-           'reuters',
-           'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
+SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnbc', 'cnn', 'engadget', 'espn', 'hacker-news', 'reuters',
+          'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
 
 SLEEP_TIME_IN_SEC = 1
 SLEEP_TIME_IN_MILI_SEC = 0.3
@@ -94,18 +92,6 @@ def check_article_length(content):  # Only post articles that have more than 500
         return True
 
 
-#def nlp_sum(article):
-    #return article.nlp()
-
-
-#def keywords(article):
-    #return article.keywords
-
-
-#def summary(article):
-    #return article.summary
-
-
 def nlp(dict_url):
     np.load_stopwords()
     text_keyws = list(np.keywords(dict_url['article']).keys())
@@ -114,7 +100,7 @@ def nlp(dict_url):
     dict_url['keywords'] = keyws
     max_sents = 5
 
-    summary_sents = np.summarize(dict_url['article'], dict_url['title'], max_sents)
+    summary_sents = np.summarize(dict_url['title'], dict_url['article'], max_sents)
     summary = '\n'.join(summary_sents)
     dict_url['summary'] = summary
     return dict_url
