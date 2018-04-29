@@ -13,10 +13,11 @@ URL_API = 'http://localhost:3000'
 TOKEN = ''
 DUPLICATE_KEYS = []  # contain links of news sources that is already scrap
 URL_NEWAPI = "https://newsapi.org/v1/articles?source="
-API_KEY = "&apiKey=4b6587f8cd2149e9916c4705ad524c3a"
-SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnbc', 'cnn', 'engadget', 'espn', 'hacker-news', 'reuters',
-          'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
-
+API_KEY = "&apiKey=310673ab67a84347a95ca7db86288f38"
+# SOURCES = {'bbc-news', 'bloomberg', 'business-insider', 'buzzfeed', 'cnbc', 'cnn', 'engadget', 'espn', 'hacker-news',
+#            'techcrunch', 'techradar', 'the-new-york-times', 'the-verge', 'time', 'usa-today'}
+SOURCES = {'bbc-news', 'bloomberg', 'buzzfeed', 'cnn',
+           'techcrunch', 'the-new-york-times'}
 SLEEP_TIME_IN_SEC = 1
 SLEEP_TIME_IN_MILI_SEC = 0.3
 
