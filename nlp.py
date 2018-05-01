@@ -4,8 +4,10 @@ from collections import Counter
 
 import settings
 
-
 ideal = 20.0
+
+
+stopwords = set()
 
 
 def load_stopwords():
@@ -14,7 +16,7 @@ def load_stopwords():
     with open(stopwordsFile, 'r', encoding='utf-8') as f:
         stopwords.update(set([w.strip() for w in f.readlines()]))
 
-def summarize(url='', title='', text='', max_sents=5):
+def summarize(title='', text='', max_sents=5):
     if not text or not title or max_sents <= 0:
         return []
     summaries = []
@@ -114,6 +116,7 @@ def keywords(text):
 
 def split_sentences(text):
     import nltk.data
+    nltk.download('punkt')
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
     sentences = tokenizer.tokenize(text)
     sentences = [x.replace('\n', '') for x in sentences if len(x) > 10]
