@@ -99,6 +99,9 @@ def get_base_domain(url):
         return base_domain
 
 
+# TODO: assert statements are commented out for full-text
+
+
 if __name__ == '__main__':
     argv = list(sys.argv)
     if 'fulltext' in argv:
