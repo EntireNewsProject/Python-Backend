@@ -4,21 +4,17 @@ from collections import Counter
 
 import settings
 
-IDEAL = 20.0
-STOPWORDS = set()
 
-
-# Preparing for keyword function
+ideal = 20.0
 
 
 def load_stopwords():
-    global STOPWORDS
-    stop_words_file = settings.NLP_STOPWORDS_EN
-    with open(stop_words_file, 'r', encoding='utf-8') as f:
-        STOPWORDS.update(set([w.strip() for w in f.readlines()]))
+    global stopwords
+    stopwordsFile = settings.NLP_STOPWORDS_EN
+    with open(stopwordsFile, 'r', encoding='utf-8') as f:
+        stopwords.update(set([w.strip() for w in f.readlines()]))
 
-
-def summarize(title='', text='', max_sents=5):
+def summarize(url='', title='', text='', max_sents=5):
     if not text or not title or max_sents <= 0:
         return []
     summaries = []
@@ -26,30 +22,27 @@ def summarize(title='', text='', max_sents=5):
     keys = keywords(text)
     titleWords = split_words(title)
 
-   #Score sentences, and use the top 5 or max_sents 
     ranks = score(sentences, titleWords, keys).most_common(max_sents)
     for rank in ranks:
         summaries.append(rank[0])
     summaries.sort(key=lambda summary: summary[0])
     return [summary[1] for summary in summaries]
 
-
-def score(sentences, title_words, key_words):
-    sen_size = len(sentences)
+def score(sentences, titleWords, keywords):
+    senSize = len(sentences)
     ranks = Counter()
     for i, s in enumerate(sentences):
         sentence = split_words(s)
-        titleFeature = title_score(title_words, sentence)
+        titleFeature = title_score(titleWords, sentence)
         sentenceLength = length_score(len(sentence))
-        sentencePosition = sentence_position(i + 1, sen_size)
-        sbsFeature = sbs(sentence, key_words)
-        dbsFeature = dbs(sentence, key_words)
+        sentencePosition = sentence_position(i + 1, senSize)
+        sbsFeature = sbs(sentence, keywords)
+        dbsFeature = dbs(sentence, keywords)
         frequency = (sbsFeature + dbsFeature) / 2.0 * 10.0
-        totalScore = (titleFeature * 1.5 + frequency * 2.0 +
-                      sentenceLength * 1.0 + sentencePosition * 1.0) / 4.0
+        totalScore = (titleFeature*1.5 + frequency*2.0 +
+                      sentenceLength*1.0 + sentencePosition*1.0)/4.0
         ranks[(i, s)] = totalScore
     return ranks
-
 
 def sbs(words, keywords):
     score = 0.0
@@ -62,7 +55,7 @@ def sbs(words, keywords):
 
 
 def dbs(words, keywords):
-    if len(words) == 0:
+    if (len(words) == 0):
         return 0
     summ = 0
     first = []
@@ -96,7 +89,7 @@ def keywords(text):
     text = split_words(text)
     if text:
         num_words = len(text)
-        text = [x for x in text if x not in STOPWORDS]
+        text = [x for x in text if x not in stopwords]
         freq = {}
         for word in text:
             if word in freq:
@@ -121,23 +114,21 @@ def keywords(text):
 
 def split_sentences(text):
     import nltk.data
-    nltk.download('punkt')
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
     sentences = tokenizer.tokenize(text)
     sentences = [x.replace('\n', '') for x in sentences if len(x) > 10]
     return sentences
 
-
 def length_score(sentence_len):
-    return 1 - math.fabs(IDEAL - sentence_len) / IDEAL
+    return 1 - math.fabs(ideal - sentence_len) / ideal
 
 
 def title_score(title, sentence):
     if title:
-        title = [x for x in title if x not in STOPWORDS]
+        title = [x for x in title if x not in stopwords]
         count = 0.0
         for word in sentence:
-            if (word not in STOPWORDS and word in title):
+            if (word not in stopwords and word in title):
                 count += 1.0
         return count / max(len(title), 1)
     else:
@@ -170,3 +161,4 @@ def sentence_position(i, size):
         return 0.17
     else:
         return 0
+
