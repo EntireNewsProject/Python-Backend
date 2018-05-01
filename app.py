@@ -112,7 +112,6 @@ def scrap_data(url):
     print('scraping data started')
     req = requests.get(URL_NEWAPI + url + API_KEY)  # getting articles from source for example: cnn, bbc-news, cnbc, etc
     dict_source = loads(req.text)  # reading the content (json format) from source
-    print(dict_source)
     if req.status_code == 400:  # If unable to find source then exit
         print('Source is incorrect or try replacing all spaces with " - " character')
         return
@@ -131,9 +130,7 @@ def scrap_data(url):
                 dict_url['article'] = text
                 dict_url['cover'] = article['urlToImage']
                 dict_url['date'] = article['publishedAt']
-                print(dict_url)
                 dict_url = nlp(dict_url)
-                print(dict_url)
                 # dict_url['keywords'] = get_keywords(news)
                 # dict_url['tags'] = get_tags(news)
                 data = json.dumps(dict_url)
