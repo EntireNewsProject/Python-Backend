@@ -1,0 +1,16 @@
+bbc.com
+bloomberg.com
+BusinessInsider.com
+buzzfeed.com
+cnn.com
+cnbc.com
+engadget.com
+ESPN.com
+HackerNews.com
+Reuters.com
+TechCrunch.com
+TechRadar.com
+TheNewYorkTimes.com
+TheVerge.com
+Time.com
+USAToday.com
