@@ -154,6 +154,13 @@ class ArticleTestCase(unittest.TestCase):
                'march/index.html?iref=allsearch',
                self.article.url)
 
+        @print_test
+        def test_download_html(self):
+            self.setup_stage('download')
+            html = mock_resource_with('cnn_article', 'html')
+            self.article.download(html)
+            self.assertEqual(75406, len(self.article.html))
+
 
 if __name__ == '__main__':
     argv = list(sys.argv)
