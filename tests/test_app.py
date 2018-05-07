@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-All unit tests for the newspaper library should be contained in this file.
-"""
 import sys
 import os
 import unittest
@@ -144,6 +140,19 @@ class ArticleTestCase(unittest.TestCase):
             if name == stage_name:
                 break
             action()
+
+#Err Fixed: Called before the first test case of this unit begins
+       def setUp(self):
+
+           self.article = Article(
+               url='http://www.cnn.com/2018/03/27/weather-'
+                   'march/index.html?iref=allsearch')
+       @print_test
+       def test_url(self):
+           self.assertEqual(
+               'http://www.cnn.com/2018/03/27/weather-'
+               'march/index.html?iref=allsearch',
+               self.article.url)
 
 
 if __name__ == '__main__':
