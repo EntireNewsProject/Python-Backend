@@ -168,6 +168,8 @@ class ArticleTestCase(unittest.TestCase):
         self.article.download(html)
         self.assertEqual(75406, len(self.article.html))
 
+# Hitting example.com in this unit test and checking redirect
+
     @print_test
     def test_meta_refresh_redirect(self):
         config = Configuration()
@@ -189,6 +191,13 @@ class ArticleTestCase(unittest.TestCase):
         article.download(input_html=html)
         article.parse()
         self.assertEqual(article.title, 'News from The Associated Press')
+
+# Err Fixed: Called before the first test case of this unit begins
+        @print_test
+        def test_pre_download_parse(self):
+
+            article = Article(self.article.url)
+            self.assertRaises(ArticleException, article.parse)
 
 
 if __name__ == '__main__':
