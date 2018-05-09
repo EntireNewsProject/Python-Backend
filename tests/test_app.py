@@ -52,7 +52,7 @@ def mock_resource_with(filename, resource_type):
 
 def get_base_domain(url):
 
-# Checks URL domains
+    # Checks URL domains
 
     domain = get_domain(url)
     tld = '.'.join(domain.split('.')[-2:])
@@ -68,6 +68,8 @@ def check_url(*args, **kwargs):
     return ExhaustiveFullTextCase.check_url(*args, **kwargs)
 
 # Skips if not in 'fulltext.txt' else extracts and checks
+
+
 @unittest.skipIf('fulltext' not in sys.argv, 'Skipping fulltext tests')
 class ExhaustiveFullTextCase(unittest.TestCase):
     @staticmethod
@@ -125,6 +127,8 @@ class ExhaustiveFullTextCase(unittest.TestCase):
         self.assertGreaterEqual(20, total_fulltext_failed)
 
 # For nlp - Parse, MetaData, NLP
+
+
 class ArticleTestCase(unittest.TestCase):
     def setup_stage(self, stage_name):
         stages = OrderedDict([
@@ -132,7 +136,7 @@ class ArticleTestCase(unittest.TestCase):
             ('download', lambda: self.article.download(
                 mock_resource_with('cnn_article', 'html'))),
             ('parse', lambda: self.article.parse()),
-            ('meta', lambda: None),
+            ('meta', lambda: None),  # Alias for nlp
             ('nlp', lambda: self.article.nlp())
         ])
         assert stage_name in stages
@@ -141,30 +145,56 @@ class ArticleTestCase(unittest.TestCase):
                 break
             action()
 
-#Err Fixed: Called before the first test case of this unit begins
-       def setUp(self):
+# Err Fixed: Called before the first test case of this unit begins
 
-           self.article = Article(
-               url='http://www.cnn.com/2018/03/27/weather-'
-                   'march/index.html?iref=allsearch')
-       @print_test
-       def test_url(self):
-           self.assertEqual(
-               'http://www.cnn.com/2018/03/27/weather-'
-               'march/index.html?iref=allsearch',
-               self.article.url)
+    def setUp(self):
+        """Called before the first test case of this unit begins
+        """
+        self.article = Article(
+            url='http://www.cnn.com/2013/11/27/travel/weather-'
+                'thanksgiving/index.html?iref=allsearch')
 
-        @print_test
-        def test_download_html(self):
-            self.setup_stage('download')
-            html = mock_resource_with('cnn_article', 'html')
-            self.article.download(html)
-            self.assertEqual(75406, len(self.article.html))
+    @print_test
+    def test_url(self):
+        self.assertEqual(
+            'http://www.cnn.com/2013/11/27/travel/weather-'
+            'thanksgiving/index.html?iref=allsearch',
+            self.article.url)
+
+    @print_test
+    def test_download_html(self):
+        self.setup_stage('download')
+        html = mock_resource_with('cnn_article', 'html')
+        self.article.download(html)
+        self.assertEqual(75406, len(self.article.html))
+
+    @print_test
+    def test_meta_refresh_redirect(self):
+        config = Configuration()
+        config.follow_meta_refresh = True
+        article = Article(
+            '', config=config)
+        html = mock_resource_with('google_meta_refresh', 'html')
+        article.download(input_html=html)
+        article.parse()
+        self.assertEqual(article.title, 'Example Domain')
+
+    @print_test
+    def test_meta_refresh_no_url_redirect(self):
+        config = Configuration()
+        config.follow_meta_refresh = True
+        article = Article(
+            '', config=config)
+        html = mock_resource_with('ap_meta_refresh', 'html')
+        article.download(input_html=html)
+        article.parse()
+        self.assertEqual(article.title, 'News from The Associated Press')
 
 
 if __name__ == '__main__':
     argv = list(sys.argv)
     if 'fulltext' in argv:
-        argv.remove('fulltext')  # remove it here, so it doesn't pass to unittest
+        # remove it here, so it doesn't pass to unittest
+        argv.remove('fulltext')
 
     unittest.main(verbosity=0, argv=argv)
