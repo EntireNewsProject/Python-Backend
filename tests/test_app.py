@@ -200,6 +200,28 @@ class ArticleTestCase(unittest.TestCase):
             self.assertRaises(ArticleException, article.parse)
 
 
+# Checks that irrelevant data in url isn't considered as publishing date
+    @print_test
+    def test_pubdate(self):
+        from newspaper.urls import STRICT_DATE_REGEX
+        with open(os.path.join(TEST_DIR, 'data/test_urls_pubdate.txt'), 'r') as f:
+            lines = f.readlines()
+            test_tuples = [tuple(l.strip().split(' ')) for l in lines]
+            # is present in the url, '0' otherwise
+            for pubdate, url in test_tuples:
+                is_present = bool(int(pubdate))
+                date_match = re.search(STRICT_DATE_REGEX, url)
+                try:
+                    self.assertEqual(is_present, bool(date_match))
+                except AssertionError:
+                    if is_present:
+                        print('\t\tpublishing date in %s should be present' % (url))
+                    else:
+                        print(
+                            '\t\tpublishing date in %s should not be present' % (url))
+                    raise
+
+
 if __name__ == '__main__':
     argv = list(sys.argv)
     if 'fulltext' in argv:
